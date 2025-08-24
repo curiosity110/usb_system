@@ -1,7 +1,7 @@
 """Routes for client resources."""
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException, Request, status, Form
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.exc import IntegrityError
@@ -42,52 +42,6 @@ def client_detail_page(
     )
 
 
-@router.get("/clients/{client_id}/bookings", response_class=HTMLResponse)
-def client_bookings(
-    request: Request, client_id: int, db_session: Session = Depends(db.get_db)
-):
-    client = crud.clients.get_client(db_session, client_id)
-    if not client:
-        raise HTTPException(status_code=404, detail="Client not found")
-    trips = crud.trips.list_trips(db_session)
-    return templates.TemplateResponse(
-        "clients/_bookings.html", {"request": request, "client": client, "trips": trips}
-    )
-
-
-@router.post("/clients/{client_id}/bookings", response_class=HTMLResponse)
-def add_client_booking(
-    request: Request,
-    client_id: int,
-    trip_id: int = Form(...),
-    db_session: Session = Depends(db.get_db),
-):
-    try:
-        crud.bookings.create_booking(
-            db_session, schemas.BookingCreate(client_id=client_id, trip_id=trip_id)
-        )
-    except IntegrityError:
-        db_session.rollback()
-    client = crud.clients.get_client(db_session, client_id)
-    trips = crud.trips.list_trips(db_session)
-    return templates.TemplateResponse(
-        "clients/_bookings.html", {"request": request, "client": client, "trips": trips}
-    )
-
-
-@router.delete("/clients/{client_id}/bookings/{booking_id}", response_class=HTMLResponse)
-def delete_client_booking(
-    request: Request,
-    client_id: int,
-    booking_id: int,
-    db_session: Session = Depends(db.get_db),
-):
-    crud.bookings.delete_booking(db_session, booking_id)
-    client = crud.clients.get_client(db_session, client_id)
-    trips = crud.trips.list_trips(db_session)
-    return templates.TemplateResponse(
-        "clients/_bookings.html", {"request": request, "client": client, "trips": trips}
-    )
 
 
 @router.post(
@@ -101,7 +55,7 @@ def create_client(
     db_session: Session = Depends(db.get_db),
 ):
     matches = dedupe.find_potential_duplicates(db_session, client_in)
-    if matches:
+    if matches and not any(score == 1.0 for _, score in matches):
         return templates.TemplateResponse(
             "clients/merge.html",
             {"request": request, "candidate": client_in, "matches": matches},

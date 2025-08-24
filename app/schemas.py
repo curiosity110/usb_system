@@ -3,12 +3,12 @@ from __future__ import annotations
 
 from datetime import date, datetime
 
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel
 
 
 class ClientBase(BaseModel):
     name: str
-    email: EmailStr
+    email: str
     phone: str | None = None
     dob: date | None = None
 

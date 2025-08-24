@@ -71,3 +71,21 @@ class AuditLog(Base):
     before = Column(JSON, nullable=True)
     after = Column(JSON, nullable=True)
     timestamp = Column(DateTime, server_default=func.now(), nullable=False)
+
+
+class SyncOutbox(Base):
+    """Outbox table for synchronization."""
+
+    __tablename__ = "sync_outbox"
+
+    id = Column(Integer, primary_key=True, index=True)
+    entity = Column(String, nullable=False)
+    entity_id = Column(Integer, nullable=False)
+    logical_clock = Column(Integer, nullable=False)
+    op = Column(String, nullable=False)
+    payload = Column(JSON, nullable=True)
+    updated_at = Column(DateTime, server_default=func.now(), nullable=False)
+
+    __table_args__ = (
+        UniqueConstraint("entity", "entity_id", "logical_clock", name="uq_sync_clock"),
+    )
