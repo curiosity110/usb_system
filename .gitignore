@@ -1,17 +1,22 @@
-# build artifacts / binaries / local data
-/.venv/
-/dist/
-/build/
-/.pytest_cache/
-/__pycache__/
-*.spec
-*.exe
-*.dll
-*.pdb
-*.db
-*.sqlite
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.egg
+.build/
+build/
+dist/
+.eggs/
+.env
+.venv
+venv/
+.envrc
 *.sqlite3
-*.log
-/data/
-.logs/
-/static/*.map
+
+# IDEs
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
