@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Bookings</h1>
+<ul>
+{% for b in bookings %}<li>{{ b.client.first_name }} - {{ b.trip.name }}</li>{% endfor %}
+</ul>
+{% endblock %}

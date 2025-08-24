@@ -5,6 +5,7 @@
 /.pytest_cache/
 /__pycache__/
 *.spec
+!packaging/build.spec
 *.exe
 *.dll
 *.pdb

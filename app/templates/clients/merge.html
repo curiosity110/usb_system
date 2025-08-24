@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Merge Clients</h1>
+<div>
+  <h3>Existing</h3>
+  {{ left.first_name }} {{ left.last_name }}
+</div>
+<div>
+  <h3>New</h3>
+  {{ right.first_name }} {{ right.last_name }}
+</div>
+{% endblock %}

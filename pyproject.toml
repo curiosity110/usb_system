@@ -1,0 +1,25 @@
+[project]
+name = "astraion-travel-usb-app"
+version = "0.1.0"
+description = "Local-first travel agency app"
+authors = [{name = "Astraion"}]
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "sqlalchemy>=2",
+    "pydantic",
+    "rapidfuzz",
+    "jinja2",
+    "typer",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pre-commit",
+]
+
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
