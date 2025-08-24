@@ -1,0 +1,51 @@
+name: Build & Release Astraion (Windows)
+
+on:
+    push:
+        tags:
+            - "v*"
+    workflow_dispatch: {} # lets you run it manually too
+
+jobs:
+    build:
+        runs-on: windows-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Set up Python
+              uses: actions/setup-python@v5
+              with:
+                  python-version: "3.11"
+
+            - name: Install build deps
+              run: |
+                  python -m pip install --upgrade pip
+                  pip install . pyinstaller
+
+            - name: Build EXE with PyInstaller
+              run: |
+                  pyinstaller packaging/build.spec --noconfirm
+
+            - name: Find built EXE
+              id: findexe
+              shell: bash
+              run: |
+                  echo "exe=$(ls -1 dist/*.exe | head -n1)" >> "$GITHUB_OUTPUT"
+
+            - name: Upload build artifact (optional fallback)
+              uses: actions/upload-artifact@v4
+              with:
+                  name: Astraion-exe
+                  path: ${{ steps.findexe.outputs.exe }}
+
+            - name: Create GitHub Release and upload EXE
+              if: startsWith(github.ref, 'refs/tags/')
+              uses: softprops/action-gh-release@v2
+              with:
+                  files: |
+                      ${{ steps.findexe.outputs.exe }}
+                      Start.bat
+                      config/app.env.sample
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
