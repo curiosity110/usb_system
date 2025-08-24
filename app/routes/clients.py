@@ -8,6 +8,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from .. import crud, db, schemas
+from ..services import dedupe
 
 router = APIRouter()
 templates = Jinja2Templates(directory="app/templates")
@@ -40,14 +41,44 @@ def client_detail_page(
     )
 
 
-@router.post("/clients", response_model=schemas.ClientRead, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/clients",
+    response_model=schemas.ClientRead,
+    status_code=status.HTTP_201_CREATED,
+)
 def create_client(
-    client_in: schemas.ClientCreate, db_session: Session = Depends(db.get_db)
+    request: Request,
+    client_in: schemas.ClientCreate,
+    db_session: Session = Depends(db.get_db),
 ):
+    matches = dedupe.find_potential_duplicates(db_session, client_in)
+    if matches:
+        return templates.TemplateResponse(
+            "clients/merge.html",
+            {"request": request, "candidate": client_in, "matches": matches},
+            status_code=409,
+        )
     try:
         return crud.clients.create_client(db_session, client_in)
     except IntegrityError as exc:
         db_session.rollback()
         raise HTTPException(
-            status_code=400, detail="Client with this email or phone already exists"
+            status_code=400, detail="Client with this email or phone already exists",
         ) from exc
+
+
+@router.post(
+    "/clients/{survivor_id}/merge/{duplicate_id}",
+    response_model=schemas.ClientRead,
+)
+def merge_client_records(
+    survivor_id: int,
+    duplicate_id: int,
+    db_session: Session = Depends(db.get_db),
+):
+    survivor = crud.clients.get_client(db_session, survivor_id)
+    duplicate = crud.clients.get_client(db_session, duplicate_id)
+    if not survivor or not duplicate:
+        raise HTTPException(status_code=404, detail="Client not found")
+    merged = dedupe.merge_clients(db_session, survivor, duplicate)
+    return merged

@@ -1,6 +1,8 @@
 """Pydantic models for request and response bodies."""
 from __future__ import annotations
 
+from datetime import date, datetime
+
 from pydantic import BaseModel, EmailStr
 
 
@@ -8,6 +10,7 @@ class ClientBase(BaseModel):
     name: str
     email: EmailStr
     phone: str | None = None
+    dob: date | None = None
 
 
 class ClientCreate(ClientBase):
@@ -16,6 +19,8 @@ class ClientCreate(ClientBase):
 
 class ClientRead(ClientBase):
     id: int
+    uuid: str
+    created_at: datetime
 
     class Config:
         from_attributes = True
