@@ -3,5 +3,10 @@
 <h1>{{ client.name }}</h1>
 <p>Email: {{ client.email }}</p>
 <p>Phone: {{ client.phone }}</p>
+<h2>Bookings</h2>
+<div id="bookings">
+    {% include "clients/_bookings.html" %}
+</div>
+<a href="/bookings/new?client_id={{ client.id }}">Add booking</a>
 <a href="/clients">Back to list</a>
 {% endblock %}

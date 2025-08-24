@@ -1,0 +1,20 @@
+<ul>
+    {% for booking in client.bookings %}
+    <li>
+        {{ booking.trip.name }}
+        <form hx-delete="/clients/{{ client.id }}/bookings/{{ booking.id }}" hx-target="#bookings" hx-swap="outerHTML" style="display:inline">
+            <button type="submit">Remove</button>
+        </form>
+    </li>
+    {% else %}
+    <li>No bookings</li>
+    {% endfor %}
+</ul>
+<form hx-post="/clients/{{ client.id }}/bookings" hx-target="#bookings" hx-swap="outerHTML">
+    <select name="trip_id">
+        {% for trip in trips %}
+        <option value="{{ trip.id }}">{{ trip.name }}</option>
+        {% endfor %}
+    </select>
+    <button type="submit">Add booking</button>
+</form>

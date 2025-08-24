@@ -25,3 +25,10 @@ def get_booking(db: Session, booking_id: int) -> models.Booking | None:
 def list_bookings(db: Session) -> list[models.Booking]:
     stmt = select(models.Booking)
     return db.execute(stmt).scalars().all()
+
+
+def delete_booking(db: Session, booking_id: int) -> None:
+    booking = db.get(models.Booking, booking_id)
+    if booking:
+        db.delete(booking)
+        db.commit()

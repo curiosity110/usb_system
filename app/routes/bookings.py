@@ -22,12 +22,23 @@ def list_bookings_page(request: Request, db_session: Session = Depends(db.get_db
 
 
 @router.get("/bookings/new", response_class=HTMLResponse)
-def new_booking_page(request: Request, db_session: Session = Depends(db.get_db)):
+def new_booking_page(
+    request: Request,
+    client_id: int | None = None,
+    trip_id: int | None = None,
+    db_session: Session = Depends(db.get_db),
+):
     clients = crud.clients.list_clients(db_session)
     trips = crud.trips.list_trips(db_session)
     return templates.TemplateResponse(
         "bookings/new.html",
-        {"request": request, "clients": clients, "trips": trips},
+        {
+            "request": request,
+            "clients": clients,
+            "trips": trips,
+            "client_id": client_id,
+            "trip_id": trip_id,
+        },
     )
 
 

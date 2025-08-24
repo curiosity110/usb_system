@@ -6,4 +6,8 @@
     <li>Trips: {{ trip_count }}</li>
     <li>Bookings: {{ booking_count }}</li>
 </ul>
+<form hx-post="/admin/backup-now" hx-target="#backup-result" hx-swap="innerHTML">
+    <button type="submit">Backup now</button>
+</form>
+<div id="backup-result"></div>
 {% endblock %}
