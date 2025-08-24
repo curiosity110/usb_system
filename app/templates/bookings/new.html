@@ -5,14 +5,14 @@
     <label>Client:
         <select name="client_id">
             {% for client in clients %}
-                <option value="{{ client.id }}">{{ client.name }}</option>
+                <option value="{{ client.id }}" {% if client_id == client.id %}selected{% endif %}>{{ client.name }}</option>
             {% endfor %}
         </select>
     </label><br />
     <label>Trip:
         <select name="trip_id">
             {% for trip in trips %}
-                <option value="{{ trip.id }}">{{ trip.name }}</option>
+                <option value="{{ trip.id }}" {% if trip_id == trip.id %}selected{% endif %}>{{ trip.name }}</option>
             {% endfor %}
         </select>
     </label><br />
