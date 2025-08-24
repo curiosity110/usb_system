@@ -1,0 +1,17 @@
+# build artifacts / binaries / local data
+/.venv/
+/dist/
+/build/
+/.pytest_cache/
+/__pycache__/
+*.spec
+*.exe
+*.dll
+*.pdb
+*.db
+*.sqlite
+*.sqlite3
+*.log
+/data/
+.logs/
+/static/*.map
