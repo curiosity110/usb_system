@@ -4,14 +4,15 @@ __pycache__/
 *.egg-info/
 *.egg
 .build/
-build/
-dist/
+/build/
+/dist/
 .eggs/
 .env
 .venv
 venv/
 .envrc
 *.sqlite3
+*.exe
 
 # IDEs
 .idea/
