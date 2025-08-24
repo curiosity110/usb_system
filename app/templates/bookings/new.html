@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>New Booking</h1>
+<form hx-post="/bookings" hx-target="#result" hx-swap="innerHTML">
+    <label>Client:
+        <select name="client_id">
+            {% for client in clients %}
+                <option value="{{ client.id }}">{{ client.name }}</option>
+            {% endfor %}
+        </select>
+    </label><br />
+    <label>Trip:
+        <select name="trip_id">
+            {% for trip in trips %}
+                <option value="{{ trip.id }}">{{ trip.name }}</option>
+            {% endfor %}
+        </select>
+    </label><br />
+    <button type="submit">Create</button>
+</form>
+<div id="result"></div>
+{% endblock %}

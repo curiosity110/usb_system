@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>New Trip</h1>
+<form hx-post="/trips" hx-target="#result" hx-swap="innerHTML">
+    <label>Name: <input type="text" name="name" /></label><br />
+    <button type="submit">Create</button>
+</form>
+<div id="result"></div>
+{% endblock %}

@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Booking {{ booking.id }}</h1>
+<p>Client ID: {{ booking.client_id }}</p>
+<p>Trip ID: {{ booking.trip_id }}</p>
+<a href="/bookings">Back to list</a>
+{% endblock %}
