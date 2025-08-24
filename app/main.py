@@ -1,6 +1,8 @@
 """Entry point for the FastAPI application."""
 from __future__ import annotations
 
+import os
+
 from fastapi import Depends, FastAPI, Request
 from fastapi.responses import HTMLResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
@@ -51,3 +53,5 @@ def backup_now() -> str:
 app.include_router(routes.clients.router)
 app.include_router(routes.trips.router)
 app.include_router(routes.bookings.router)
+if os.getenv("DEV_SYNC") == "1":
+    app.include_router(routes.sync.router)

@@ -5,11 +5,20 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from .. import models, schemas
+from ..services import sync
 
 
 def create_trip(db: Session, trip_in: schemas.TripCreate) -> models.Trip:
     trip = models.Trip(name=trip_in.name)
     db.add(trip)
+    db.flush()
+    sync.enqueue_outbox(
+        db,
+        entity="trip",
+        entity_id=trip.id,
+        op="create",
+        payload={"id": trip.id, "name": trip.name},
+    )
     db.commit()
     db.refresh(trip)
     return trip

@@ -108,7 +108,7 @@ def merge_clients(db: Session, a: models.Client, b: models.Client) -> models.Cli
 
     # Re-point foreign keys
     for booking in list(duplicate.bookings):
-        booking.client_id = survivor.id
+        booking.client = survivor
 
     db.delete(duplicate)
     audit.log_action(
