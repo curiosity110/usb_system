@@ -1,0 +1,37 @@
+[project]
+name = "astraion-travel-usb-app"
+version = "0.1.0"
+description = "Astraion Travel USB Application"
+authors = [ { name = "Astraion Travel" } ]
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi",
+    "uvicorn[standard]",
+    "sqlalchemy>=2",
+    "alembic",
+    "pydantic>=2",
+    "python-dotenv",
+    "apscheduler",
+    "rapidfuzz",
+    "jinja2",
+    "h11",
+    "httpx",
+    "pytest",
+    "pytest-cov",
+]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.black]
+line-length = 88
+target-version = ["py311"]
+
+[tool.isort]
+profile = "black"
+
+[tool.ruff]
+line-length = 88
+select = ["E", "F", "I"]
