@@ -12,6 +12,7 @@ from sqlalchemy import (
     Integer,
     String,
     UniqueConstraint,
+    CheckConstraint,
     func,
 )
 from sqlalchemy.orm import DeclarativeBase, relationship
@@ -88,4 +89,49 @@ class SyncOutbox(Base):
 
     __table_args__ = (
         UniqueConstraint("entity", "entity_id", "logical_clock", name="uq_sync_clock"),
+    )
+
+
+class Vehicle(Base):
+    __tablename__ = "vehicles"
+
+    id = Column(String, primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
+    plate = Column(String, nullable=False, unique=True, index=True)
+    model = Column(String, nullable=False)
+    year = Column(Integer, nullable=True)
+    notes = Column(String, nullable=True)
+    created_at = Column(DateTime, server_default=func.now(), nullable=False)
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now(), nullable=False)
+
+    maintenance_records = relationship("Maintenance", back_populates="vehicle")
+
+
+class Maintenance(Base):
+    __tablename__ = "maintenance"
+
+    id = Column(String, primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
+    vehicle_id = Column(String, ForeignKey("vehicles.id"), nullable=False, index=True)
+    kind = Column(String, nullable=False)
+    due_date = Column(Date, nullable=False)
+    completed_at = Column(DateTime, nullable=True)
+    notes = Column(String, nullable=True)
+    created_at = Column(DateTime, server_default=func.now(), nullable=False)
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now(), nullable=False)
+
+    vehicle = relationship("Vehicle", back_populates="maintenance_records")
+
+
+class Reminder(Base):
+    __tablename__ = "reminders"
+
+    id = Column(String, primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
+    scope = Column(String, nullable=False)
+    ref_id = Column(String, nullable=True)
+    title = Column(String, nullable=False)
+    due_date = Column(Date, nullable=False)
+    assigned_role = Column(String, nullable=True)
+    done_at = Column(DateTime, nullable=True)
+
+    __table_args__ = (
+        CheckConstraint("scope IN ('global','vehicle','trip','client')", name="ck_reminder_scope"),
     )
