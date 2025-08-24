@@ -4,9 +4,15 @@
     <meta charset="UTF-8" />
     <title>Astraion Travel USB App</title>
     <link rel="stylesheet" href="/static/css/app.css" />
+    <script src="https://unpkg.com/htmx.org@1.9.9"></script>
 </head>
 <body>
-    <h1>Welcome to Astraion Travel</h1>
+    <nav>
+        <a href="/">Home</a> |
+        <a href="/clients">Clients</a> |
+        <a href="/trips">Trips</a> |
+        <a href="/bookings">Bookings</a>
+    </nav>
     {% block content %}{% endblock %}
 </body>
 </html>

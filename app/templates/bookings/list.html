@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Bookings</h1>
+<ul>
+{% for booking in bookings %}
+  <li>Client {{ booking.client_id }} - Trip {{ booking.trip_id }}</li>
+{% endfor %}
+</ul>
+<a href="/bookings/new">New Booking</a>
+{% endblock %}

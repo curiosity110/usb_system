@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Clients</h1>
+<form hx-get="/clients" hx-target="#client-list">
+    <input type="text" name="q" value="{{ q }}" placeholder="Search" />
+    <button type="submit">Search</button>
+</form>
+<div id="client-list">
+    <ul>
+    {% for client in clients %}
+        <li><a href="/clients/{{ client.id }}">{{ client.name }}</a> - {{ client.email }} - {{ client.phone }}</li>
+    {% endfor %}
+    </ul>
+</div>
+<a href="/clients/new">New Client</a>
+{% endblock %}
