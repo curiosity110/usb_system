@@ -5,6 +5,7 @@ from sqlalchemy import Select, func, or_, select
 from sqlalchemy.orm import Session
 
 from .. import models, schemas
+from ..services import audit
 from ..services.phone import normalize_phone
 
 
@@ -15,8 +16,24 @@ def create_client(db: Session, client_in: schemas.ClientCreate) -> models.Client
         email=client_in.email.lower(),
         phone=client_in.phone,
         normalized_phone=normalize_phone(client_in.phone),
+        dob=client_in.dob,
     )
     db.add(client)
+    db.flush()
+    audit.log_action(
+        db,
+        action="create",
+        entity="client",
+        entity_id=client.id,
+        before=None,
+        after={
+            "id": client.id,
+            "name": client.name,
+            "email": client.email,
+            "phone": client.phone,
+            "dob": client.dob.isoformat() if client.dob else None,
+        },
+    )
     db.commit()
     db.refresh(client)
     return client

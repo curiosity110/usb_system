@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Merge Clients</title>
+</head>
+<body>
+<h1>Potential duplicate clients</h1>
+<div>
+    <h2>New Client</h2>
+    <ul>
+        <li>Name: {{ candidate.name }}</li>
+        <li>Email: {{ candidate.email }}</li>
+        <li>Phone: {{ candidate.phone }}</li>
+        <li>DOB: {{ candidate.dob }}</li>
+    </ul>
+</div>
+{% for match, score in matches %}
+<div>
+    <h2>Existing Client ({{ (score*100)|round(2) }}% match)</h2>
+    <ul>
+        <li>Name: {{ match.name }}</li>
+        <li>Email: {{ match.email }}</li>
+        <li>Phone: {{ match.phone }}</li>
+        <li>DOB: {{ match.dob }}</li>
+    </ul>
+</div>
+{% endfor %}
+</body>
+</html>
