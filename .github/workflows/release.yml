@@ -2,15 +2,14 @@ name: Build & Release Astraion (Windows)
 
 on:
     push:
-        tags:
-            - "v*"
+        tags: ["v*"]
     workflow_dispatch: {}
 
 jobs:
     build:
         runs-on: windows-latest
         permissions:
-            contents: write # lets GITHUB_TOKEN create a Release
+            contents: write
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -26,9 +25,10 @@ jobs:
                   pip install -r requirements.txt
                   pip install pyinstaller
 
-            - name: Build EXE with PyInstaller
+            # Simple & robust: build a single-file EXE directly (skip .spec for now)
+            - name: Build EXE (one-file)
               run: |
-                  pyinstaller packaging/build.spec --noconfirm
+                  pyinstaller -F -n Astraion app/main.py
 
             - name: Find built EXE
               id: findexe
