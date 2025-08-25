@@ -1,10 +1,9 @@
 from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Request, status
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, RedirectResponse, StreamingResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
-
 from .. import crud, db
 from ..schemas import ClientCreate            # <-- concrete schema import
 from ..services import dedupe, audit
@@ -13,6 +12,31 @@ import io
 
 router = APIRouter()
 templates = Jinja2Templates(directory="app/templates")
+
+
+# CSV & Excell Exports
+@router.get("/clients/export")
+def export_clients_csv(q: str = "", db_session: Session = Depends(db.get_db)):
+    rows = crud.clients.list_clients(db_session, q)
+
+    def generate():
+        buf = io.StringIO()
+        writer = csv.writer(buf)
+        writer.writerow(["id", "first_name", "last_name", "email", "phone", "dob"])
+        yield buf.getvalue(); buf.seek(0); buf.truncate(0)
+        for c in rows:
+            writer.writerow([
+                c.id,
+                c.first_name,
+                c.last_name,
+                c.email or "",
+                c.phone or "",
+                c.dob.isoformat() if c.dob else "",
+            ])
+            yield buf.getvalue(); buf.seek(0); buf.truncate(0)
+
+    headers = {"Content-Disposition": "attachment; filename=clients.csv"}
+    return StreamingResponse(generate(), media_type="text/csv", headers=headers)
 
 @router.get("/clients", response_class=HTMLResponse)
 def list_clients_page(request: Request, q: str = "", db_session: Session = Depends(db.get_db)):
@@ -61,26 +85,3 @@ def client_detail_page(request: Request, client_id: int, db_session: Session = D
         {"request": request, "client": client, "trips": trips, "timeline": timeline},
     )
 
-# CSV & Excell Exports
-@router.get("/clients/export")
-def export_clients_csv(q: str = "", db_session: Session = Depends(db.get_db)):
-    rows = crud.clients.list_clients(db_session, q)
-
-    def generate():
-        buf = io.StringIO()
-        writer = csv.writer(buf)
-        writer.writerow(["id", "first_name", "last_name", "email", "phone", "dob"])
-        yield buf.getvalue(); buf.seek(0); buf.truncate(0)
-        for c in rows:
-            writer.writerow([
-                c.id,
-                c.first_name,
-                c.last_name,
-                c.email or "",
-                c.phone or "",
-                c.dob.isoformat() if c.dob else "",
-            ])
-            yield buf.getvalue(); buf.seek(0); buf.truncate(0)
-
-    headers = {"Content-Disposition": "attachment; filename=clients.csv"}
-    return StreamingResponse(generate(), media_type="text/csv", headers=headers)
