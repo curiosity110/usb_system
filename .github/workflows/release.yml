@@ -52,3 +52,8 @@ jobs:
                       config/app.env.sample
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+git add -A
+git commit -m "Fix CI: no pip install ., add app.env.sample"
+git tag -a v0.1.2 -m "One-file build"
+git push origin main
+git push origin v0.1.2
