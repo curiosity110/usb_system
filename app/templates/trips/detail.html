@@ -1,6 +1,21 @@
 {% extends "base.html" %}
 {% block content %}
-<h1>{{ trip.name }}</h1>
-<a href="/bookings/new?trip_id={{ trip.id }}">Add booking</a>
-<a href="/trips">Back to list</a>
+<h1>Trip #{{ trip.id }} — {{ trip.name }}</h1>
+<p><strong>Destination:</strong> {{ trip.destination or "" }}</p>
+<p><strong>Dates:</strong> {{ trip.start_date or "" }} – {{ trip.end_date or "" }}</p>
+<p><strong>Notes:</strong> {{ trip.notes or "" }}</p>
+
+<h2>Bookings</h2>
+<ul>
+  {% for b in trip.bookings %}
+    <li>Client <a href="/clients/{{ b.client.id }}">{{ b.client.first_name }} {{ b.client.last_name }}</a>
+    {% if b.status %} — Status: {{ b.status }}{% endif %}
+    {% if b.notes %} — Notes: {{ b.notes }}{% endif %}
+    </li>
+  {% else %}
+    <li>No bookings yet.</li>
+  {% endfor %}
+</ul>
+
+<p><a href="/trips">Back to trips</a></p>
 {% endblock %}

@@ -1,20 +1,27 @@
-"""Database configuration and session management."""
-
+# app/db.py
+from __future__ import annotations
+from pathlib import Path
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from .config import settings
+BASE_DIR = Path(__file__).resolve().parent.parent
+DATA_DIR = BASE_DIR / "data"
+DATA_DIR.mkdir(exist_ok=True)
 
-DATABASE_URL = "sqlite:///./app.db"
+DATABASE_URL = f"sqlite:///{(DATA_DIR / 'astraion.db').as_posix()}"
 
-engine = create_engine(DATABASE_URL, future=True, echo=False)
+engine = create_engine(
+    DATABASE_URL,
+    future=True,
+    echo=False,
+    connect_args={"check_same_thread": False},
+)
 SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False, future=True)
 
-
 def get_db():
-    """Yield a database session."""
     db = SessionLocal()
     try:
         yield db
     finally:
         db.close()
+

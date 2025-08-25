@@ -1,10 +1,33 @@
 {% extends "base.html" %}
 {% block content %}
 <h1>Trips</h1>
-<ul>
-{% for trip in trips %}
-  <li><a href="/trips/{{ trip.id }}">{{ trip.name }}</a></li>
-{% endfor %}
-</ul>
-<a href="/trips/new">New Trip</a>
+
+<p><a href="/trips/new">+ New trip</a></p>
+
+<table border="1" cellpadding="6" cellspacing="0">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Destination</th>
+      <th>Start</th>
+      <th>End</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for t in trips %}
+    <tr>
+      <td>{{ t.id }}</td>
+      <td>{{ t.name }}</td>
+      <td>{{ t.destination or "" }}</td>
+      <td>{{ t.start_date or "" }}</td>
+      <td>{{ t.end_date or "" }}</td>
+      <td><a href="/trips/{{ t.id }}">Open</a></td>
+    </tr>
+    {% else %}
+    <tr><td colspan="6">No trips yet.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
 {% endblock %}

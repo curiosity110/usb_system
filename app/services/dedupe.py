@@ -26,38 +26,29 @@ def normalized_email(email: str) -> str:
     return f"{local}@{domain}"
 
 
-def find_potential_duplicates(
-    db: Session, candidate: schemas.ClientCreate
-) -> List[Tuple[models.Client, float]]:
-    """Return potential duplicates for the candidate client."""
+def _full_name(first: str | None, last: str | None) -> str:
+    return " ".join([first or "", last or ""]).strip()
 
-    results: List[Tuple[models.Client, float]] = []
-    norm_email = normalized_email(candidate.email)
-    norm_phone = normalize_phone(candidate.phone)
-    phone_tail = norm_phone[-7:] if norm_phone else None
+def find_potential_duplicates(db: Session, candidate: schemas.ClientCreate):
+    cand_email = (candidate.email or "").lower()
+    cand_phone = normalize_phone(candidate.phone)
+    cand_name  = _full_name(candidate.first_name, candidate.last_name)
 
-    existing_clients = db.execute(select(models.Client)).scalars().all()
-    for existing in existing_clients:
-        # email match rule
-        if norm_email == normalized_email(existing.email):
-            results.append((existing, 1.0))
-            continue
+    results: list[tuple[models.Client, float]] = []
+    for c in db.execute(select(models.Client)).scalars():
+        score = 0.0
+        # Exact email = certain duplicate
+        if c.email and cand_email and c.email.lower() == cand_email:
+            score = 1.0
+        else:
+            if cand_phone and c.normalized_phone and cand_phone == c.normalized_phone:
+                score = max(score, 0.9)
+            name_score = token_sort_ratio(cand_name, _full_name(c.first_name, c.last_name)) / 100.0
+            score = max(score, name_score)
 
-        name_sim = token_sort_ratio(candidate.name, existing.name) / 100
-        # name + dob rule
-        if candidate.dob and existing.dob:
-            if candidate.dob == existing.dob and name_sim >= 0.9:
-                results.append((existing, name_sim))
-                continue
-        # name + phone rule
-        if phone_tail and existing.normalized_phone:
-            if existing.normalized_phone[-7:] == phone_tail and name_sim >= 0.85:
-                results.append((existing, name_sim))
-                continue
-
-    return results
-
-
+        if score >= 0.85:
+            results.append((c, score))
+    return sorted(results, key=lambda x: x[1], reverse=True)
 def _name_preference(n1: str | None, n2: str | None) -> str | None:
     """Choose better name preferring non-empty and longer tokenized strings."""
 

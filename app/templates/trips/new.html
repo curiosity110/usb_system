@@ -1,9 +1,30 @@
 {% extends "base.html" %}
 {% block content %}
 <h1>New Trip</h1>
-<form hx-post="/trips" hx-target="#result" hx-swap="innerHTML">
-    <label>Name: <input type="text" name="name" /></label><br />
+<form method="post" action="/trips">
+  <div>
+    <label>Name *</label><br/>
+    <input type="text" name="name" required />
+  </div>
+  <div>
+    <label>Destination</label><br/>
+    <input type="text" name="destination" />
+  </div>
+  <div>
+    <label>Start date</label><br/>
+    <input type="date" name="start_date" />
+  </div>
+  <div>
+    <label>End date</label><br/>
+    <input type="date" name="end_date" />
+  </div>
+  <div>
+    <label>Notes</label><br/>
+    <textarea name="notes" rows="3"></textarea>
+  </div>
+  <div style="margin-top:0.75rem;">
     <button type="submit">Create</button>
+    <a href="/trips">Cancel</a>
+  </div>
 </form>
-<div id="result"></div>
 {% endblock %}

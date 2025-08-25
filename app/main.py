@@ -2,14 +2,20 @@
 
 from __future__ import annotations
 
+
 import argparse
+import uvicorn
 import os
 import sys
+import logging
+import json
 from pathlib import Path
+
+from fastapi.exceptions import RequestValidationError
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from fastapi import Depends, FastAPI, Request
-from fastapi.responses import HTMLResponse, PlainTextResponse
+from fastapi.responses import HTMLResponse, PlainTextResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import func
@@ -46,6 +52,16 @@ scheduler = BackgroundScheduler()
 scheduler.add_job(backups.backup_db, "cron", hour=2, minute=30)
 scheduler.start()
 
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request, exc: RequestValidationError):
+    body = (await request.body()).decode("utf-8", "ignore")
+    logging.error("422 on %s %s\nErrors: %s\nBody: %s",
+                  request.method, request.url.path, json.dumps(exc.errors(), indent=2), body)
+    if request.headers.get("hx-request") == "true":
+        items = "".join(f"<li>{e['loc']}: {e['msg']}</li>" for e in exc.errors())
+        return HTMLResponse(f"<div class='error'><h4>Validation error</h4><ul>{items}</ul></div>", status_code=422)
+    return JSONResponse(status_code=422, content={"detail": exc.errors()})
+
 
 # ----- Routes -----
 @app.get("/", response_class=HTMLResponse)
@@ -79,15 +95,13 @@ if os.getenv("DEV_SYNC") == "1":
 
 # ----- CLI entry (USB Start.bat passes --db, --port) -----
 def run_server(db_path: str, port: int, logdir: str | None = None):
-    os.environ.setdefault("DB_PATH", db_path)
+    os.environ["DB_PATH"] = db_path  # make db.py pick the right file
     if logdir:
         os.makedirs(logdir, exist_ok=True)
         os.environ.setdefault("LOG_DIR", logdir)
-    import uvicorn
-
     uvicorn.run("app.main:app", host="127.0.0.1", port=port, log_level="info")
-
-
+    
+    
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--db", dest="db_path", default="./data/astraion.db")

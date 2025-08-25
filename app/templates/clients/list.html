@@ -1,16 +1,41 @@
 {% extends "base.html" %}
 {% block content %}
 <h1>Clients</h1>
-<form hx-get="/clients" hx-target="#client-list">
-    <input type="text" name="q" value="{{ q }}" placeholder="Search" />
-    <button type="submit">Search</button>
+
+<form method="get" action="/clients" style="margin-bottom:1rem;">
+  <input type="text" name="q" value="{{ q or '' }}" placeholder="Search name/email/phone" />
+  <button type="submit">Search</button>
+  <a href="/clients">Clear</a>
 </form>
-<div id="client-list">
-    <ul>
-    {% for client in clients %}
-        <li><a href="/clients/{{ client.id }}">{{ client.name }}</a> - {{ client.email }} - {{ client.phone }}</li>
+
+<p><a href="/clients/new">+ New client</a></p>
+
+<table border="1" cellpadding="6" cellspacing="0">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>First name</th>
+      <th>Last name</th>
+      <th>Email</th>
+      <th>Phone</th>
+      <th>DOB</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for c in clients %}
+    <tr>
+      <td>{{ c.id }}</td>
+      <td>{{ c.first_name }}</td>
+      <td>{{ c.last_name }}</td>
+      <td>{{ c.email or "" }}</td>
+      <td>{{ c.phone or "" }}</td>
+      <td>{{ c.dob or "" }}</td>
+      <td><a href="/clients/{{ c.id }}">Open</a></td>
+    </tr>
+    {% else %}
+    <tr><td colspan="7">No clients yet.</td></tr>
     {% endfor %}
-    </ul>
-</div>
-<a href="/clients/new">New Client</a>
+  </tbody>
+</table>
 {% endblock %}

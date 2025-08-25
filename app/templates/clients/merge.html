@@ -1,29 +1,32 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Merge Clients</title>
-</head>
-<body>
-<h1>Potential duplicate clients</h1>
-<div>
-    <h2>New Client</h2>
-    <ul>
-        <li>Name: {{ candidate.name }}</li>
-        <li>Email: {{ candidate.email }}</li>
-        <li>Phone: {{ candidate.phone }}</li>
-        <li>DOB: {{ candidate.dob }}</li>
-    </ul>
-</div>
-{% for match, score in matches %}
-<div>
-    <h2>Existing Client ({{ (score*100)|round(2) }}% match)</h2>
-    <ul>
-        <li>Name: {{ match.name }}</li>
-        <li>Email: {{ match.email }}</li>
-        <li>Phone: {{ match.phone }}</li>
-        <li>DOB: {{ match.dob }}</li>
-    </ul>
-</div>
+{% extends "base.html" %}
+{% block content %}
+<h1>Possible duplicate found</h1>
+
+<h2>New client candidate</h2>
+<ul>
+  <li>{{ candidate.first_name }} {{ candidate.last_name }}</li>
+  <li>{{ candidate.email or "" }}</li>
+  <li>{{ candidate.phone or "" }}</li>
+  <li>{{ candidate.dob or "" }}</li>
+</ul>
+
+<h2>Matches</h2>
+<ul>
+{% for m in matches %}
+  {% set existing = m[0] if m is sequence else m %}
+  {% set score = m[1] if m is sequence else '?' %}
+  <li>
+    {{ existing.first_name }} {{ existing.last_name }} — {{ existing.email or "" }} — {{ existing.phone or "" }}
+    (score: {{ score }})
+    <a href="/clients/{{ existing.id }}">Open</a>
+  </li>
+{% else %}
+  <li>No matches.</li>
 {% endfor %}
-</body>
-</html>
+</ul>
+
+<p>
+  <a href="/clients/new">Edit details</a> |
+  <a href="/clients">Back</a>
+</p>
+{% endblock %}

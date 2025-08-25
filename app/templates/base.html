@@ -1,18 +1,27 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <title>Astraion Travel USB App</title>
-    <link rel="stylesheet" href="/static/css/app.css" />
-    <script src="https://unpkg.com/htmx.org@1.9.9"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Astraion Travel</title>
+  <link rel="stylesheet" href="/static/css/app.css">
+  <script src="https://unpkg.com/htmx.org@1.9.12"></script>
 </head>
 <body>
-    <nav>
-        <a href="/">Home</a> |
-        <a href="/clients">Clients</a> |
-        <a href="/trips">Trips</a> |
-        <a href="/bookings">Bookings</a>
+  <header class="container">
+    <nav class="nav">
+      <a href="/">Home</a> |
+      <a href="/clients">Clients</a> |
+      <a href="/trips">Trips</a> |
+      <a href="/bookings">Bookings</a>
+      <form style="display:inline;margin-left:1rem;" action="/admin/backup-now" method="post">
+        <button type="submit">Backup now</button>
+      </form>
     </nav>
+    <hr/>
+  </header>
+  <main class="container">
     {% block content %}{% endblock %}
+  </main>
 </body>
 </html>

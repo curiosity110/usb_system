@@ -1,11 +1,30 @@
 {% extends "base.html" %}
 {% block content %}
 <h1>New Client</h1>
-<form hx-post="/clients" hx-target="#result" hx-swap="innerHTML">
-    <label>Name: <input type="text" name="name" /></label><br />
-    <label>Email: <input type="email" name="email" /></label><br />
-    <label>Phone: <input type="text" name="phone" /></label><br />
+<form method="post" action="/clients">
+  <div>
+    <label>First name *</label><br/>
+    <input type="text" name="first_name" required />
+  </div>
+  <div>
+    <label>Last name *</label><br/>
+    <input type="text" name="last_name" required />
+  </div>
+  <div>
+    <label>Email</label><br/>
+    <input type="email" name="email" />
+  </div>
+  <div>
+    <label>Phone</label><br/>
+    <input type="text" name="phone" />
+  </div>
+  <div>
+    <label>Date of birth</label><br/>
+    <input type="date" name="dob" />
+  </div>
+  <div style="margin-top:0.75rem;">
     <button type="submit">Create</button>
+    <a href="/clients">Cancel</a>
+  </div>
 </form>
-<div id="result"></div>
 {% endblock %}

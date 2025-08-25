@@ -29,23 +29,40 @@ class Client(Base):
     id = Column(Integer, primary_key=True, index=True)
     uuid = Column(String, unique=True, index=True, default=lambda: str(uuid.uuid4()))
     created_at = Column(DateTime, server_default=func.now(), nullable=False)
-    name = Column(String, nullable=False)
-    email = Column(String, nullable=False, unique=True, index=True)
+
+    first_name = Column(String(100), nullable=False)
+    last_name  = Column(String(100), nullable=False)
+    email = Column(String, nullable=True, unique=True, index=True)  # <= allow NULL if you want
     phone = Column(String, nullable=True)
-    normalized_phone = Column(String, nullable=True, unique=True, index=True)
+    normalized_phone = Column(String, nullable=True, unique=True, index=True)  # <= keep as Column
     dob = Column(Date, nullable=True)
 
     bookings = relationship("Booking", back_populates="client")
 
+    @property
+    def name(self) -> str:
+        return f"{self.first_name} {self.last_name}".strip()
 
+    # IMPORTANT: do NOT also define @property normalized_phone here.
+    # If you want a computed helper, name it something else, e.g.:
+    # def normalized_phone_computed(self): ...
+    
+    
 class Trip(Base):
     __tablename__ = "trips"
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False)
 
-    bookings = relationship("Booking", back_populates="trip")
+    # ADD THESE:
+    destination = Column(String(200), nullable=True)
+    start_date = Column(Date, nullable=True)
+    end_date = Column(Date, nullable=True)
+    notes = Column(String(1000), nullable=True)
 
+    bookings = relationship("Booking", back_populates="trip")
+    created_at = Column(DateTime, server_default=func.now(), nullable=False)
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now(), nullable=False)
 
 class Booking(Base):
     __tablename__ = "bookings"
@@ -58,6 +75,8 @@ class Booking(Base):
     trip = relationship("Trip", back_populates="bookings")
 
     __table_args__ = (UniqueConstraint("client_id", "trip_id", name="uq_booking_client_trip"),)
+    created_at = Column(DateTime, server_default=func.now(), nullable=False)
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now(), nullable=False)
 
 
 class AuditLog(Base):

@@ -19,6 +19,7 @@ dependencies = [
     "httpx",
     "pytest",
     "pytest-cov",
+    "pydantic[email]"
 ]
 
 [build-system]

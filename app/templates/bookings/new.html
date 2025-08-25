@@ -1,22 +1,45 @@
 {% extends "base.html" %}
 {% block content %}
 <h1>New Booking</h1>
-<form hx-post="/bookings" hx-target="#result" hx-swap="innerHTML">
-    <label>Client:
-        <select name="client_id">
-            {% for client in clients %}
-                <option value="{{ client.id }}" {% if client_id == client.id %}selected{% endif %}>{{ client.name }}</option>
-            {% endfor %}
-        </select>
-    </label><br />
-    <label>Trip:
-        <select name="trip_id">
-            {% for trip in trips %}
-                <option value="{{ trip.id }}" {% if trip_id == trip.id %}selected{% endif %}>{{ trip.name }}</option>
-            {% endfor %}
-        </select>
-    </label><br />
+
+{% if not clients or not trips %}
+  <p>You need at least one client and one trip to create a booking.</p>
+  <ul>
+    <li><a href="/clients/new">Create a client</a></li>
+    <li><a href="/trips/new">Create a trip</a></li>
+  </ul>
+{% else %}
+<form method="post" action="/bookings">
+  <div>
+    <label>Client *</label><br/>
+    <select name="client_id" required>
+      <option value="">-- choose client --</option>
+      {% for c in clients %}
+        <option value="{{ c.id }}">{{ c.first_name }} {{ c.last_name }} ({{ c.email or c.phone or 'no contact' }})</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div>
+    <label>Trip *</label><br/>
+    <select name="trip_id" required>
+      <option value="">-- choose trip --</option>
+      {% for t in trips %}
+        <option value="{{ t.id }}">{{ t.name }}{% if t.start_date %} — {{ t.start_date }}{% endif %}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div>
+    <label>Status</label><br/>
+    <input type="text" name="status" placeholder="e.g. reserved, paid, canceled" />
+  </div>
+  <div>
+    <label>Notes</label><br/>
+    <textarea name="notes" rows="3"></textarea>
+  </div>
+  <div style="margin-top:0.75rem;">
     <button type="submit">Create</button>
+    <a href="/bookings">Cancel</a>
+  </div>
 </form>
-<div id="result"></div>
+{% endif %}
 {% endblock %}

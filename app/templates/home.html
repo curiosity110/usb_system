@@ -1,13 +1,10 @@
 {% extends "base.html" %}
 {% block content %}
-<h1>Dashboard</h1>
+<h1>Welcome to Astraion Travel</h1>
+<p>Use the navigation to manage clients, trips, and bookings.</p>
 <ul>
-    <li>Clients: {{ client_count }}</li>
-    <li>Trips: {{ trip_count }}</li>
-    <li>Bookings: {{ booking_count }}</li>
+  <li><a href="/clients">Clients</a></li>
+  <li><a href="/trips">Trips</a></li>
+  <li><a href="/bookings">Bookings</a></li>
 </ul>
-<form hx-post="/admin/backup-now" hx-target="#backup-result" hx-swap="innerHTML">
-    <button type="submit">Backup now</button>
-</form>
-<div id="backup-result"></div>
 {% endblock %}
