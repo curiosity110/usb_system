@@ -7,16 +7,33 @@
 <p><strong>Phone:</strong> {{ client.phone or "" }}</p>
 <p><strong>DOB:</strong> {{ client.dob or "" }}</p>
 
+<h2>Add {{ client.first_name }} to a trip</h2>
+<form method="post" action="/bookings?next=/clients/{{ client.id }}">
+  <input type="hidden" name="client_id" value="{{ client.id }}">
+  <label>Trip:
+    <select name="trip_id" required>
+      {% for t in trips %}
+      <option value="{{ t.id }}">
+        {{ t.name }}
+        {% if t.start_date %} — {{ t.start_date }}{% endif %}
+      </option>
+      {% endfor %}
+    </select>
+  </label>
+  <button type="submit">Add</button>
+</form>
+</p>
+
 <h2>Trip history</h2>
 <ul>
   {% for b in client.bookings %}
-    <li>
-      Trip: <a href="/trips/{{ b.trip.id }}">{{ b.trip.name }}</a>
-      {% if b.status %} — Status: {{ b.status }}{% endif %}
-      {% if b.notes %} — Notes: {{ b.notes }}{% endif %}
-    </li>
+  <li>
+    Trip: <a href="/trips/{{ b.trip.id }}">{{ b.trip.name }}</a>
+    {% if b.status %} — Status: {{ b.status }}{% endif %}
+    {% if b.notes %} — Notes: {{ b.notes }}{% endif %}
+  </li>
   {% else %}
-    <li>No bookings yet.</li>
+  <li>No bookings yet.</li>
   {% endfor %}
 </ul>
 

@@ -3,6 +3,7 @@ from datetime import date, datetime
 from fastapi import Form
 from pydantic import BaseModel, EmailStr
 from pydantic import ConfigDict
+from sqlalchemy import String
 
 
 
@@ -30,16 +31,17 @@ class ClientCreate(ClientBase):
         cls,
         first_name: str = Form(...),
         last_name: str = Form(...),
-        email: str | None = Form(None),   # accept raw string from form
-        phone: str | None = Form(None),   # accept raw string from form
-        dob: str | None = Form(None),     # accept raw string from form
+        email: EmailStr | None = Form(None),
+        phone: str | None = Form(None),
+        dob: str | None = Form(None),  # <-- string from form
     ) -> "ClientCreate":
+        dob_val = date.fromisoformat(dob) if dob else None
         return cls(
-            first_name=(first_name or "").strip(),
-            last_name=(last_name or "").strip(),
-            email=_none_if_blank(email),                 # '' -> None
-            phone=_none_if_blank(phone),                 # '' -> None
-            dob=date.fromisoformat(dob) if dob else None # parse only if provided
+            first_name=first_name,
+            last_name=last_name,
+            email=email,
+            phone=phone,
+            dob=dob_val,
         )
 
 class ClientRead(ORMModel, ClientBase):

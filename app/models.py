@@ -71,6 +71,10 @@ class Booking(Base):
     client_id = Column(Integer, ForeignKey("clients.id"), nullable=False)
     trip_id = Column(Integer, ForeignKey("trips.id"), nullable=False)
 
+    # ADD THESE TWO COLUMNS:
+    status = Column(String(50), nullable=True)
+    notes  = Column(String(1000), nullable=True)
+
     client = relationship("Client", back_populates="bookings")
     trip = relationship("Trip", back_populates="bookings")
 
@@ -78,7 +82,7 @@ class Booking(Base):
     created_at = Column(DateTime, server_default=func.now(), nullable=False)
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now(), nullable=False)
 
-
+    
 class AuditLog(Base):
     """Simple audit log table capturing entity changes."""
 

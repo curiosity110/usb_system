@@ -37,4 +37,5 @@ def create_booking(
             {"request": request, "error": "That client is already booked on this trip."},
             status_code=400,
         )
-    return RedirectResponse(url="/bookings", status_code=status.HTTP_303_SEE_OTHER)
+    next_url = request.query_params.get("next")
+    return RedirectResponse(url=(next_url or "/bookings"), status_code=status.HTTP_303_SEE_OTHER)

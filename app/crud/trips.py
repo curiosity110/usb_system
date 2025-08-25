@@ -1,15 +1,13 @@
 # app/crud/trips.py
+from __future__ import annotations
 from sqlalchemy.orm import Session
-
 from .. import models, schemas
 
 def list_trips(db: Session) -> list[models.Trip]:
-    # no created_at dependency
-    return db.query(models.Trip).order_by(models.Trip.id.desc()).all()
+    return db.query(models.Trip).order_by(models.Trip.created_at.desc()).all()
 
-def get_trip(db: Session, trip_id: int):
-    return db.query(models.Trip).filter(models.Trip.id == trip_id).first()
-
+def get_trip(db: Session, trip_id: int) -> models.Trip | None:
+    return db.get(models.Trip, trip_id)
 
 def create_trip(db: Session, trip_in: schemas.TripCreate) -> models.Trip:
     trip = models.Trip(

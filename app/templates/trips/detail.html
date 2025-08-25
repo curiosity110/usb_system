@@ -1,21 +1,29 @@
 {% extends "base.html" %}
 {% block content %}
-<h1>Trip #{{ trip.id }} — {{ trip.name }}</h1>
-<p><strong>Destination:</strong> {{ trip.destination or "" }}</p>
-<p><strong>Dates:</strong> {{ trip.start_date or "" }} – {{ trip.end_date or "" }}</p>
-<p><strong>Notes:</strong> {{ trip.notes or "" }}</p>
+<h1>{{ trip.name }}</h1>
 
-<h2>Bookings</h2>
+<div class="card">
+  <p><strong>Destination:</strong> {{ trip.destination or "-" }}</p>
+  <p><strong>Dates:</strong>
+    {% if trip.start_date %}{{ trip.start_date }}{% else %}—{% endif %}
+    →
+    {% if trip.end_date %}{{ trip.end_date }}{% else %}—{% endif %}
+  </p>
+  <p><strong>Notes:</strong> {{ trip.notes or "-" }}</p>
+</div>
+
+<h2>Travelers</h2>
 <ul>
-  {% for b in trip.bookings %}
-    <li>Client <a href="/clients/{{ b.client.id }}">{{ b.client.first_name }} {{ b.client.last_name }}</a>
-    {% if b.status %} — Status: {{ b.status }}{% endif %}
-    {% if b.notes %} — Notes: {{ b.notes }}{% endif %}
+  {% for b in bookings %}
+    <li>
+      <a href="/clients/{{ b.client.id }}">
+        {{ b.client.first_name }} {{ b.client.last_name }}
+      </a>
     </li>
   {% else %}
     <li>No bookings yet.</li>
   {% endfor %}
 </ul>
 
-<p><a href="/trips">Back to trips</a></p>
+<p><a href="/bookings/new">Add booking</a></p>
 {% endblock %}
