@@ -1,10 +1,12 @@
 {% extends "base.html" %}
 {% block content %}
 <h1>Trips</h1>
+<div class="card">
 <ul>
 {% for trip in trips %}
   <li><a href="/trips/{{ trip.id }}">{{ trip.name }}</a></li>
 {% endfor %}
 </ul>
-<a href="/trips/new">New Trip</a>
+</div>
+<a href="/trips/new">New Trip</a> | <a href="/trips/export">Export to Excel</a>
 {% endblock %}

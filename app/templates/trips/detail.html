@@ -2,5 +2,15 @@
 {% block content %}
 <h1>{{ trip.name }}</h1>
 <a href="/bookings/new?trip_id={{ trip.id }}">Add booking</a>
+<div class="card">
+    <h2>Timeline</h2>
+    <ul class="timeline">
+        {% for log in logs %}
+            <li>{{ log.timestamp }} - {{ log.action }}</li>
+        {% else %}
+            <li>No activity recorded.</li>
+        {% endfor %}
+    </ul>
+</div>
 <a href="/trips">Back to list</a>
 {% endblock %}

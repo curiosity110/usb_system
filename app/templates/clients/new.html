@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 {% block content %}
 <h1>New Client</h1>
+<div id="result"></div>
 <form hx-post="/clients" hx-target="#result" hx-swap="innerHTML">
     <label>Name: <input type="text" name="name" /></label><br />
     <label>Email: <input type="email" name="email" /></label><br />
     <label>Phone: <input type="text" name="phone" /></label><br />
     <button type="submit">Create</button>
 </form>
-<div id="result"></div>
 {% endblock %}
