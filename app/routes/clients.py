@@ -7,7 +7,9 @@ from sqlalchemy.orm import Session
 
 from .. import crud, db
 from ..schemas import ClientCreate            # <-- concrete schema import
-from ..services import dedupe
+from ..services import dedupe, audit
+import csv
+import io
 
 router = APIRouter()
 templates = Jinja2Templates(directory="app/templates")
@@ -53,4 +55,32 @@ def client_detail_page(request: Request, client_id: int, db_session: Session = D
     if not client:
         raise HTTPException(status_code=404, detail="Client not found")
     trips = crud.trips.list_trips(db_session)
-    return templates.TemplateResponse("clients/detail.html", {"request": request, "client": client, "trips": trips})
+    timeline = audit.get_timeline_for_client(db_session, client_id)
+    return templates.TemplateResponse(
+        "clients/detail.html",
+        {"request": request, "client": client, "trips": trips, "timeline": timeline},
+    )
+
+# CSV & Excell Exports
+@router.get("/clients/export")
+def export_clients_csv(q: str = "", db_session: Session = Depends(db.get_db)):
+    rows = crud.clients.list_clients(db_session, q)
+
+    def generate():
+        buf = io.StringIO()
+        writer = csv.writer(buf)
+        writer.writerow(["id", "first_name", "last_name", "email", "phone", "dob"])
+        yield buf.getvalue(); buf.seek(0); buf.truncate(0)
+        for c in rows:
+            writer.writerow([
+                c.id,
+                c.first_name,
+                c.last_name,
+                c.email or "",
+                c.phone or "",
+                c.dob.isoformat() if c.dob else "",
+            ])
+            yield buf.getvalue(); buf.seek(0); buf.truncate(0)
+
+    headers = {"Content-Disposition": "attachment; filename=clients.csv"}
+    return StreamingResponse(generate(), media_type="text/csv", headers=headers)

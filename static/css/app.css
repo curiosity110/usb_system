@@ -2,3 +2,13 @@ body {
     font-family: Arial, sans-serif;
     margin: 2rem;
 }
+
+:root{
+  --brand-deep-blue: #0c2a4d;
+  --brand-teal:      #1aa3a3;
+  --brand-sand:      #e9d7b7;
+}
+
+.header, .navbar { background: var(--brand-deep-blue); }
+.btn-primary     { background: var(--brand-teal); }
+.card            { border-radius: 12px; }
