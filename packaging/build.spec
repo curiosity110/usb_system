@@ -1,58 +1,73 @@
+# packaging/build.spec
 # -*- mode: python ; coding: utf-8 -*-
 
-"""PyInstaller spec for one-file Astraion executable.
+from pathlib import Path
+from PyInstaller.utils.hooks import collect_data_files
 
-This configuration bundles the FastAPI templates and static assets and
-directs PyInstaller to use a local ``logs`` directory for its runtime
-extraction and logging.
-"""
+project_root = Path(__file__).resolve().parents[1]
+pathex = [str(project_root)]
 
-import os
+datas = []
+datas += collect_data_files("app", includes=["templates/**", "templates/*.html"])
 
-block_cipher = None
+static_dir = project_root / "static"
+if static_dir.exists():
+    for p in static_dir.rglob("*"):
+        if p.is_file():
+            datas.append((str(p), "static"))
 
-# Data files: include Jinja templates and static assets.
-datas = [
-    ("app/templates", "app/templates"),
-    ("static", "static"),
-]
-
-# Ensure a logs directory exists alongside the executable.
-if not os.path.exists("logs"):
-    os.makedirs("logs")
+config_sample = project_root / "config" / "app.env.sample"
+if config_sample.exists():
+    datas.append((str(config_sample), "config"))
 
 a = Analysis(
     ["app/main.py"],
-    pathex=[],
+    pathex=pathex,
     binaries=[],
     datas=datas,
-    hiddenimports=[],
+    hiddenimports=[
+        "jinja2.ext",
+        "jinja2.loaders",
+        "app.routes.clients",
+        "app.routes.trips",
+        "app.routes.bookings",
+        "app.routes.home",
+        "app.services.dedupe",
+        "app.services.audit",
+        "app.services.backups",
+        "app.services.sync",
+        "sqlalchemy.dialects.sqlite",
+    ],
     hookspath=[],
-    hooksconfig={},
     runtime_hooks=[],
     excludes=[],
-    win_no_prefer_redirects=False,
-    win_private_assemblies=False,
-    cipher=block_cipher,
     noarchive=False,
 )
-pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
+
+pyz = PYZ(a.pure, a.zipped_data, cipher=None)
 
 exe = EXE(
     pyz,
     a.scripts,
-    a.binaries,
-    a.zipfiles,
-    a.datas,
     [],
+    exclude_binaries=True,
     name="Astraion",
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
-    upx_exclude=[],
-    runtime_tmpdir="logs",
-    console=True,
-    icon=None,
+    console=False,
 )
 
+coll = COLLECT(
+    exe,
+    a.binaries,
+    a.zipfiles,
+    a.datas,
+    strip=False,
+    upx=True,
+    upx_exclude=[],
+    name="Astraion",
+)
+
+app = BUNDLE(coll)
