@@ -5,7 +5,7 @@
   <div class="kpi">
     <div class="pill">Email: {{ client.email or '-' }}</div>
     <div class="pill">Phone: {{ client.phone or '-' }}</div>
-    <div class="pill">DOB: {{ client.dob or '-' }}</div>
+    <div class="pill">DOB: {{ client.dob.strftime('%d-%m-%Y') if client.dob else '-' }}</div>
   </div>
 </div>
 <div class="card">
