@@ -1,33 +1,32 @@
 {% extends "base.html" %}
 {% block content %}
-<h1>Trips</h1>
-
-<p><a href="/trips/new">+ New trip</a></p>
-
-<table border="1" cellpadding="6" cellspacing="0">
-  <thead>
-    <tr>
-      <th>ID</th>
-      <th>Name</th>
-      <th>Destination</th>
-      <th>Start</th>
-      <th>End</th>
-      <th>Actions</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for t in trips %}
-    <tr>
-      <td>{{ t.id }}</td>
-      <td>{{ t.name }}</td>
-      <td>{{ t.destination or "" }}</td>
-      <td>{{ t.start_date or "" }}</td>
-      <td>{{ t.end_date or "" }}</td>
-      <td><a href="/trips/{{ t.id }}">Open</a></td>
-    </tr>
-    {% else %}
-    <tr><td colspan="6">No trips yet.</td></tr>
-    {% endfor %}
-  </tbody>
-</table>
+<div class="card">
+  <div class="toolbar">
+    <h1>Trips</h1>
+    <a href="/trips/new" class="btn primary">New Trip</a>
+  </div>
+  {% set show_bookings = trips|length > 0 and trips[0].bookings is not none %}
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Created</th>
+        <th>Updated</th>
+        {% if show_bookings %}<th>#Bookings</th>{% endif %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for t in trips %}
+      <tr>
+        <td><a href="/trips/{{ t.id }}">{{ t.name }}</a></td>
+        <td>{{ t.created_at }}</td>
+        <td>{{ t.updated_at }}</td>
+        {% if show_bookings %}<td>{{ t.bookings|length }}</td>{% endif %}
+      </tr>
+      {% else %}
+      <tr><td colspan="{{ 3 + (1 if show_bookings else 0) }}">No trips yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
 {% endblock %}

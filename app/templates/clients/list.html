@@ -1,56 +1,40 @@
 {% extends "base.html" %}
 {% block content %}
-<h1>Clients</h1>
-
-<form method="get" class="flex gap-2 items-end">
-  <div>
-    <label>Search</label>
-    <input name="q" value="{{ q }}" class="input" placeholder="name/email/phone">
+<div class="card">
+  <div class="toolbar">
+    <h1>Clients <span class="muted">{{ clients|length }}</span></h1>
+    <div class="toolbar">
+      <form method="get">
+        <input name="q" value="{{ q }}" class="input" placeholder="Search">
+      </form>
+      <a href="/clients" class="btn ghost">Clear</a>
+      <a href="/clients?q={{ q }}&export=1" class="btn ghost">Export CSV</a>
+      <a href="/clients/new" class="btn primary">New Client</a>
+    </div>
   </div>
-  <div>
-    <label>Has Email</label>
-    <select name="has_email" class="input">
-      <option value="" {% if not request.query_params.get('has_email') %}selected{% endif %}>Any</option>
-      <option value="1" {% if request.query_params.get('has_email')=='1' %}selected{% endif %}>Yes</option>
-      <option value="0" {% if request.query_params.get('has_email')=='0' %}selected{% endif %}>No</option>
-    </select>
-    <a class="btn" href="/clients/export{% if q %}?q={{ q|urlencode }}{% endif %}">Export CSV</a>
-  </div>
-  <button class="btn" type="submit">Apply</button>
-  <button class="btn" type="button" id="save-view">Save View</button>
-  <button class="btn" type="button" id="load-view">Load View</button>
-</form>
-
-<p><a href="/clients/new">+ New client</a></p>
-
-<table border="1" cellpadding="6" cellspacing="0">
-  <thead>
-    <tr>
-      <th>ID</th>
-      <th>First name</th>
-      <th>Last name</th>
-      <th>Email</th>
-      <th>Phone</th>
-      <th>DOB</th>
-      <th>Actions</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for c in clients %}
-    <tr>
-      <td>{{ c.id }}</td>
-      <td>{{ c.first_name }}</td>
-      <td>{{ c.last_name }}</td>
-      <td>{{ c.email or "" }}</td>
-      <td>{{ c.phone or "" }}</td>
-      <td>{{ c.dob or "" }}</td>
-      <td><a href="/clients/{{ c.id }}">Open</a></td>
-    </tr>
-    {% else %}
-    <tr>
-      <td colspan="7">No clients yet.</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>DOB</th>
+        <th>Created</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for c in clients %}
+      <tr>
+        <td><a href="/clients/{{ c.id }}">{{ c.first_name }} {{ c.last_name }}</a></td>
+        <td>{{ c.email or "" }}</td>
+        <td>{{ c.phone or "" }}</td>
+        <td>{{ c.dob or "" }}</td>
+        <td>{{ c.created_at }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="5">No clients yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
 {% endblock %}
