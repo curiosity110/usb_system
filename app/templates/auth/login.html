@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+  <h2>Login</h2>
+  <form>
+    <label for="username">Username</label>
+    <input id="username" name="username" type="text" />
+
+    <label for="password">Password</label>
+    <input id="password" name="password" type="password" />
+
+    <label for="role">Sign in as</label>
+    <select id="role" name="role">
+      <option value="client">Client</option>
+      <option value="agent">Agent</option>
+      <option value="ceo">CEO</option>
+    </select>
+
+    <button class="btn" type="submit">Login</button>
+  </form>
+</div>
+{% endblock %}
+
