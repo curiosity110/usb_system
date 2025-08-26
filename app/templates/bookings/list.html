@@ -1,43 +1,45 @@
 {% extends "base.html" %}
 {% block content %}
-<h1>Bookings</h1>
-
-<p><a href="/bookings/new">+ New booking</a></p>
-
-<table border="1" cellpadding="6" cellspacing="0">
-  <thead>
-    <tr>
-      <th>ID</th>
-      <th>Client</th>
-      <th>Trip</th>
-      <th>Status</th>
-      <th>Notes</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for b in bookings %}
-    <tr>
-      <td>{{ b.id }}</td>
-      <td>
-        {% if b.client %}
-          <a href="/clients/{{ b.client.id }}">{{ b.client.first_name }} {{ b.client.last_name }}</a>
-        {% else %}
-          {{ b.client_id }}
-        {% endif %}
-      </td>
-      <td>
-        {% if b.trip %}
-          <a href="/trips/{{ b.trip.id }}">{{ b.trip.name }}</a>
-        {% else %}
-          {{ b.trip_id }}
-        {% endif %}
-      </td>
-      <td>{{ b.status or "" }}</td>
-      <td>{{ b.notes or "" }}</td>
-    </tr>
-    {% else %}
-    <tr><td colspan="5">No bookings yet.</td></tr>
-    {% endfor %}
-  </tbody>
-</table>
+<div class="card">
+  <div class="toolbar">
+    <h1>Bookings <span class="muted">{{ bookings|length }}</span></h1>
+    <a href="/bookings/new" class="btn primary">New Booking</a>
+  </div>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Client</th>
+        <th>Trip</th>
+        <th>Status</th>
+        <th>Notes</th>
+        <th>Created</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for b in bookings %}
+      <tr>
+        <td>
+          {% if b.client %}
+            <a href="/clients/{{ b.client.id }}">{{ b.client.first_name }} {{ b.client.last_name }}</a>
+          {% else %}
+            {{ b.client_id }}
+          {% endif %}
+        </td>
+        <td>
+          {% if b.trip %}
+            <a href="/trips/{{ b.trip.id }}">{{ b.trip.name }}</a>
+          {% else %}
+            {{ b.trip_id }}
+          {% endif %}
+        </td>
+        <td>{{ b.status or "" }}</td>
+        <td>{{ b.notes or "" }}</td>
+        <td>{{ b.created_at }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="5">No bookings yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
 {% endblock %}

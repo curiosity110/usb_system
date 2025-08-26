@@ -1,41 +1,43 @@
 {% extends "base.html" %}
 {% block content %}
-<h1>Client #{{ client.id }}</h1>
-
-<p><strong>Name:</strong> {{ client.first_name }} {{ client.last_name }}</p>
-<p><strong>Email:</strong> {{ client.email or "" }}</p>
-<p><strong>Phone:</strong> {{ client.phone or "" }}</p>
-<p><strong>DOB:</strong> {{ client.dob or "" }}</p>
-
-<h2>Add {{ client.first_name }} to a trip</h2>
-<form method="post" action="/bookings?next=/clients/{{ client.id }}">
-  <input type="hidden" name="client_id" value="{{ client.id }}">
-  <label>Trip:
-    <select name="trip_id" required>
+<div class="card">
+  <h1>{{ client.first_name }} {{ client.last_name }}</h1>
+  <div class="kpi">
+    <div class="pill">Email: {{ client.email or '-' }}</div>
+    <div class="pill">Phone: {{ client.phone or '-' }}</div>
+    <div class="pill">DOB: {{ client.dob or '-' }}</div>
+  </div>
+</div>
+<div class="card">
+  <form method="post" action="/bookings" class="toolbar">
+    <input type="hidden" name="client_id" value="{{ client.id }}">
+    <select name="trip_id" class="input" required>
       {% for t in trips %}
-      <option value="{{ t.id }}">
-        {{ t.name }}
-        {% if t.start_date %} — {{ t.start_date }}{% endif %}
-      </option>
+      <option value="{{ t.id }}">{{ t.name }}{% if t.start_date %} — {{ t.start_date }}{% endif %}</option>
       {% endfor %}
     </select>
-  </label>
-  <button type="submit">Add</button>
-</form>
-</p>
-
-<h2>Trip history</h2>
-<ul>
-  {% for b in client.bookings %}
-  <li>
-    Trip: <a href="/trips/{{ b.trip.id }}">{{ b.trip.name }}</a>
-    {% if b.status %} — Status: {{ b.status }}{% endif %}
-    {% if b.notes %} — Notes: {{ b.notes }}{% endif %}
-  </li>
-  {% else %}
-  <li>No bookings yet.</li>
-  {% endfor %}
-</ul>
-
+    <button type="submit" class="btn primary">Add to Trip</button>
+  </form>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Trip</th>
+        <th>Status</th>
+        <th>Notes</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for b in client.bookings %}
+      <tr>
+        <td><a href="/trips/{{ b.trip.id }}">{{ b.trip.name }}</a></td>
+        <td>{{ b.status or "" }}</td>
+        <td>{{ b.notes or "" }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="3">No bookings yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
 <p><a href="/clients">Back to list</a></p>
 {% endblock %}
