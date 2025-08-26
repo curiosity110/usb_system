@@ -38,10 +38,35 @@ def export_clients_csv(q: str = "", db_session: Session = Depends(db.get_db)):
     headers = {"Content-Disposition": "attachment; filename=clients.csv"}
     return StreamingResponse(generate(), media_type="text/csv", headers=headers)
 
+from datetime import datetime
+
+
 @router.get("/clients", response_class=HTMLResponse)
-def list_clients_page(request: Request, q: str = "", db_session: Session = Depends(db.get_db)):
+def list_clients_page(
+    request: Request,
+    q: str = "",
+    dob_q: str = "",
+    db_session: Session = Depends(db.get_db),
+):
     clients = crud.clients.list_clients(db_session, q)
-    return templates.TemplateResponse("clients/list.html", {"request": request, "clients": clients, "q": q})
+
+    if dob_q:
+        try:
+            if len(dob_q) == 5:
+                dt = datetime.strptime(dob_q, "%d-%m")
+                clients = [
+                    c for c in clients if c.dob and c.dob.day == dt.day and c.dob.month == dt.month
+                ]
+            else:
+                dt = datetime.strptime(dob_q, "%d-%m-%Y").date()
+                clients = [c for c in clients if c.dob == dt]
+        except ValueError:
+            clients = []
+
+    return templates.TemplateResponse(
+        "clients/list.html",
+        {"request": request, "clients": clients, "q": q, "dob_q": dob_q},
+    )
 
 @router.get("/clients/new", response_class=HTMLResponse)
 def new_client_page(request: Request):
