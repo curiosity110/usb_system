@@ -1,29 +1,46 @@
 {% extends "base.html" %}
 {% block content %}
-<h1>{{ trip.name }}</h1>
-
 <div class="card">
-  <p><strong>Destination:</strong> {{ trip.destination or "-" }}</p>
-  <p><strong>Dates:</strong>
-    {% if trip.start_date %}{{ trip.start_date }}{% else %}—{% endif %}
-    →
-    {% if trip.end_date %}{{ trip.end_date }}{% else %}—{% endif %}
-  </p>
-  <p><strong>Notes:</strong> {{ trip.notes or "-" }}</p>
+  <h1>{{ trip.name }}</h1>
+  <div class="kpi">
+    <div class="pill">Created: {{ trip.created_at }}</div>
+    <div class="pill">Updated: {{ trip.updated_at }}</div>
+  </div>
+  <p>Destination: {{ trip.destination or '-' }}</p>
+  <p>Dates: {{ trip.start_date or '—' }} → {{ trip.end_date or '—' }}</p>
+  {% if trip.notes %}<p>{{ trip.notes }}</p>{% endif %}
 </div>
-
-<h2>Travelers</h2>
-<ul>
-  {% for b in bookings %}
-    <li>
-      <a href="/clients/{{ b.client.id }}">
-        {{ b.client.first_name }} {{ b.client.last_name }}
-      </a>
-    </li>
-  {% else %}
-    <li>No bookings yet.</li>
-  {% endfor %}
-</ul>
-
-<p><a href="/bookings/new">Add booking</a></p>
+<div class="card">
+  {% if clients is defined and clients %}
+  <form method="post" action="/bookings" class="toolbar">
+    <input type="hidden" name="trip_id" value="{{ trip.id }}">
+    <select name="client_id" class="input" required>
+      {% for c in clients %}
+      <option value="{{ c.id }}">{{ c.first_name }} {{ c.last_name }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit" class="btn primary">Add Client</button>
+  </form>
+  {% endif %}
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Client</th>
+        <th>Status</th>
+        <th>Notes</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for b in bookings %}
+      <tr>
+        <td><a href="/clients/{{ b.client.id }}">{{ b.client.first_name }} {{ b.client.last_name }}</a></td>
+        <td>{{ b.status or "" }}</td>
+        <td>{{ b.notes or "" }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="3">No bookings yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
 {% endblock %}
