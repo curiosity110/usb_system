@@ -24,3 +24,7 @@ Thumbs.db
 data/astraion.db
 data/backups/20250825-1339.db data/backups/20250825-1344.db data/backups/20250825-1533.db data/backups/20250825-1606.db
 *.db
+
+
+# Private Notes 
+notes.txt
