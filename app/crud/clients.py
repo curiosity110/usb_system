@@ -1,6 +1,7 @@
 # app/crud/clients.py
 from sqlalchemy.orm import Session
 from sqlalchemy import or_
+from datetime import date
 
 from .. import models, schemas
 from ..services.phone import normalize_phone
@@ -10,14 +11,19 @@ def list_clients(db: Session, q: str = ""):
     query = db.query(models.Client)
     if q:
         q_like = f"%{q.lower()}%"
-        query = query.filter(
-            or_(
-                models.Client.first_name.ilike(q_like),
-                models.Client.last_name.ilike(q_like),
-                models.Client.email.ilike(q_like),
-                models.Client.phone.ilike(q_like),
-            )
-        )
+        conditions = [
+            models.Client.first_name.ilike(q_like),
+            models.Client.last_name.ilike(q_like),
+            models.Client.email.ilike(q_like),
+            models.Client.phone.ilike(q_like),
+        ]
+        try:
+            dob = date.fromisoformat(q)
+        except ValueError:
+            dob = None
+        if dob:
+            conditions.append(models.Client.dob == dob)
+        query = query.filter(or_(*conditions))
     return query.order_by(models.Client.created_at.desc()).all()
 
 
