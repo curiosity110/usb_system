@@ -6,9 +6,10 @@
     <div class="toolbar">
       <form method="get">
         <input name="q" value="{{ q }}" class="input" placeholder="Search">
+        <input name="dob_q" value="{{ dob_q }}" class="input" placeholder="DOB (DD-MM or DD-MM-YYYY)">
       </form>
       <a href="/clients" class="btn ghost">Clear</a>
-      <a href="/clients?q={{ q }}&export=1" class="btn ghost">Export CSV</a>
+      <a href="/clients?q={{ q }}&dob_q={{ dob_q }}&export=1" class="btn ghost">Export CSV</a>
       <a href="/clients/new" class="btn primary">New Client</a>
     </div>
   </div>
@@ -28,7 +29,7 @@
         <td><a href="/clients/{{ c.id }}">{{ c.first_name }} {{ c.last_name }}</a></td>
         <td>{{ c.email or "" }}</td>
         <td>{{ c.phone or "" }}</td>
-        <td>{{ c.dob or "" }}</td>
+        <td>{{ c.dob.strftime('%d-%m-%Y') if c.dob else "—" }}</td>
         <td>{{ c.created_at }}</td>
       </tr>
       {% else %}
