@@ -2,10 +2,23 @@
 {% block content %}
 <h1>Clients</h1>
 
-<form method="get" action="/clients" style="margin-bottom:1rem;">
-  <input type="text" name="q" value="{{ q or '' }}" placeholder="Search name/email/phone" />
-  <button type="submit">Search</button>
-  <a href="/clients">Clear</a>
+<form method="get" class="flex gap-2 items-end">
+  <div>
+    <label>Search</label>
+    <input name="q" value="{{ q }}" class="input" placeholder="name/email/phone">
+  </div>
+  <div>
+    <label>Has Email</label>
+    <select name="has_email" class="input">
+      <option value="" {% if not request.query_params.get('has_email') %}selected{% endif %}>Any</option>
+      <option value="1" {% if request.query_params.get('has_email')=='1' %}selected{% endif %}>Yes</option>
+      <option value="0" {% if request.query_params.get('has_email')=='0' %}selected{% endif %}>No</option>
+    </select>
+    <a class="btn" href="/clients/export{% if q %}?q={{ q|urlencode }}{% endif %}">Export CSV</a>
+  </div>
+  <button class="btn" type="submit">Apply</button>
+  <button class="btn" type="button" id="save-view">Save View</button>
+  <button class="btn" type="button" id="load-view">Load View</button>
 </form>
 
 <p><a href="/clients/new">+ New client</a></p>
@@ -34,7 +47,9 @@
       <td><a href="/clients/{{ c.id }}">Open</a></td>
     </tr>
     {% else %}
-    <tr><td colspan="7">No clients yet.</td></tr>
+    <tr>
+      <td colspan="7">No clients yet.</td>
+    </tr>
     {% endfor %}
   </tbody>
 </table>

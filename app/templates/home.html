@@ -1,10 +1,17 @@
 {% extends "base.html" %}
 {% block content %}
-<h1>Welcome to Astraion Travel</h1>
-<p>Use the navigation to manage clients, trips, and bookings.</p>
-<ul>
-  <li><a href="/clients">Clients</a></li>
-  <li><a href="/trips">Trips</a></li>
-  <li><a href="/bookings">Bookings</a></li>
-</ul>
+<section class="hero">
+  <h1>Discover Your Path</h1>
+  <p>Plan journeys for growth, adventure, and serenity.</p>
+  <a class="btn" href="/trips">Explore Trips</a>
+</section>
+
+<div class="card">
+  <h2>Manage</h2>
+  <ul>
+    <li><a href="/clients">Clients</a></li>
+    <li><a href="/trips">Trips</a></li>
+    <li><a href="/bookings">Bookings</a></li>
+  </ul>
+</div>
 {% endblock %}

@@ -8,20 +8,43 @@
   <script src="https://unpkg.com/htmx.org@1.9.12"></script>
 </head>
 <body>
-  <header class="container">
-    <nav class="nav">
-      <a href="/">Home</a> |
-      <a href="/clients">Clients</a> |
-      <a href="/trips">Trips</a> |
-      <a href="/bookings">Bookings</a>
-      <form style="display:inline;margin-left:1rem;" action="/admin/backup-now" method="post">
-        <button type="submit">Backup now</button>
-      </form>
-    </nav>
-    <hr/>
+  <header>
+    <div class="container">
+      <nav class="nav">
+        <a class="logo" href="/"><span class="icon icon-compass"></span> Astraion Travel</a>
+        <div class="nav-links">
+          <a href="/clients">Clients</a>
+          <a href="/trips">Trips</a>
+          <a href="/bookings">Bookings</a>
+          <a href="/login">Login</a>
+          <form action="/admin/backup-now" method="post" style="display:inline">
+            <button class="btn" type="submit">Backup</button>
+          </form>
+        </div>
+      </nav>
+    </div>
   </header>
   <main class="container">
     {% block content %}{% endblock %}
   </main>
 </body>
+<script>
+(function(){
+  const key = "clients_list_saved_view";
+  const saveBtn = document.getElementById("save-view");
+  const loadBtn = document.getElementById("load-view");
+  if (!saveBtn || !loadBtn) return;
+
+  saveBtn.addEventListener("click", () => {
+    localStorage.setItem(key, window.location.search || "?");
+    alert("Saved current filters.");
+  });
+
+  loadBtn.addEventListener("click", () => {
+    const q = localStorage.getItem(key);
+    if (q) window.location.search = q;
+    else alert("No saved view yet.");
+  });
+})();
+</script>
 </html>
