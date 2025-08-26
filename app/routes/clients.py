@@ -9,6 +9,8 @@ from ..schemas import ClientCreate            # <-- concrete schema import
 from ..services import dedupe, audit
 import csv
 import io
+import re
+from datetime import datetime
 
 router = APIRouter()
 templates = Jinja2Templates(directory="app/templates")
@@ -39,9 +41,21 @@ def export_clients_csv(q: str = "", db_session: Session = Depends(db.get_db)):
     return StreamingResponse(generate(), media_type="text/csv", headers=headers)
 
 @router.get("/clients", response_class=HTMLResponse)
-def list_clients_page(request: Request, q: str = "", db_session: Session = Depends(db.get_db)):
+def list_clients_page(request: Request, q: str = "", dob_q: str = "", db_session: Session = Depends(db.get_db)):
     clients = crud.clients.list_clients(db_session, q)
-    return templates.TemplateResponse("clients/list.html", {"request": request, "clients": clients, "q": q})
+    if dob_q:
+        if re.fullmatch(r"\d{2}-\d{2}-\d{4}", dob_q):
+            try:
+                target = datetime.strptime(dob_q, "%d-%m-%Y").date()
+                clients = [c for c in clients if c.dob == target]
+            except ValueError:
+                clients = []
+        elif re.fullmatch(r"\d{2}-\d{2}", dob_q):
+            day, month = map(int, dob_q.split("-"))
+            clients = [c for c in clients if c.dob and c.dob.day == day and c.dob.month == month]
+    return templates.TemplateResponse(
+        "clients/list.html", {"request": request, "clients": clients, "q": q, "dob_q": dob_q}
+    )
 
 @router.get("/clients/new", response_class=HTMLResponse)
 def new_client_page(request: Request):
