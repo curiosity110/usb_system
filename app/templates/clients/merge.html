@@ -7,7 +7,7 @@
   <li>{{ candidate.first_name }} {{ candidate.last_name }}</li>
   <li>{{ candidate.email or "" }}</li>
   <li>{{ candidate.phone or "" }}</li>
-  <li>{{ candidate.dob or "" }}</li>
+  <li>{{ candidate.dob.strftime('%d-%m-%Y') if candidate.dob else "" }}</li>
 </ul>
 
 <h2>Matches</h2>

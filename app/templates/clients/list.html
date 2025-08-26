@@ -4,11 +4,22 @@
   <div class="toolbar">
     <h1>Clients <span class="muted">{{ clients|length }}</span></h1>
     <div class="toolbar">
-      <form method="get">
-        <input name="q" value="{{ q }}" class="input" placeholder="Search">
+      <form method="get" class="toolbar">
+        <input name="q" value="{{ q }}" class="input" placeholder="Quick search">
+        <details {% if first or last or email or phone or dob_from or dob_to %}open{% endif %}>
+          <summary>Advanced</summary>
+          <div class="grid cols-3">
+            <input name="first" value="{{ first }}" class="input" placeholder="First">
+            <input name="last" value="{{ last }}" class="input" placeholder="Last">
+            <input name="email" value="{{ email }}" class="input" placeholder="Email">
+            <input name="phone" value="{{ phone }}" class="input" placeholder="Phone">
+            <input type="date" name="dob_from" value="{{ dob_from }}" class="input" placeholder="DOB from">
+            <input type="date" name="dob_to" value="{{ dob_to }}" class="input" placeholder="DOB to">
+          </div>
+        </details>
       </form>
       <a href="/clients" class="btn ghost">Clear</a>
-      <a href="/clients?q={{ q }}&export=1" class="btn ghost">Export CSV</a>
+      <a href="/clients/export?q={{ q }}&first={{ first }}&last={{ last }}&email={{ email }}&phone={{ phone }}&dob_from={{ dob_from }}&dob_to={{ dob_to }}" class="btn ghost">Export CSV</a>
       <a href="/clients/new" class="btn primary">New Client</a>
     </div>
   </div>
@@ -28,7 +39,7 @@
         <td><a href="/clients/{{ c.id }}">{{ c.first_name }} {{ c.last_name }}</a></td>
         <td>{{ c.email or "" }}</td>
         <td>{{ c.phone or "" }}</td>
-        <td>{{ c.dob or "" }}</td>
+        <td>{{ c.dob.strftime('%d-%m-%Y') if c.dob else '' }}</td>
         <td>{{ c.created_at }}</td>
       </tr>
       {% else %}

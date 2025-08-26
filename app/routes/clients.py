@@ -1,3 +1,4 @@
+from datetime import date
 from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.responses import HTMLResponse, RedirectResponse, StreamingResponse
@@ -16,8 +17,26 @@ templates = Jinja2Templates(directory="app/templates")
 
 # CSV & Excell Exports
 @router.get("/clients/export")
-def export_clients_csv(q: str = "", db_session: Session = Depends(db.get_db)):
-    rows = crud.clients.list_clients(db_session, q)
+def export_clients_csv(
+    q: str = "",
+    first: str = "",
+    last: str = "",
+    email: str = "",
+    phone: str = "",
+    dob_from: date | None = None,
+    dob_to: date | None = None,
+    db_session: Session = Depends(db.get_db),
+):
+    rows = crud.clients.list_clients(
+        db_session,
+        q,
+        first=first,
+        last=last,
+        email=email,
+        phone=phone,
+        dob_from=dob_from,
+        dob_to=dob_to,
+    )
 
     def generate():
         buf = io.StringIO()
@@ -39,9 +58,41 @@ def export_clients_csv(q: str = "", db_session: Session = Depends(db.get_db)):
     return StreamingResponse(generate(), media_type="text/csv", headers=headers)
 
 @router.get("/clients", response_class=HTMLResponse)
-def list_clients_page(request: Request, q: str = "", db_session: Session = Depends(db.get_db)):
-    clients = crud.clients.list_clients(db_session, q)
-    return templates.TemplateResponse("clients/list.html", {"request": request, "clients": clients, "q": q})
+def list_clients_page(
+    request: Request,
+    q: str = "",
+    first: str = "",
+    last: str = "",
+    email: str = "",
+    phone: str = "",
+    dob_from: date | None = None,
+    dob_to: date | None = None,
+    db_session: Session = Depends(db.get_db),
+):
+    clients = crud.clients.list_clients(
+        db_session,
+        q,
+        first=first,
+        last=last,
+        email=email,
+        phone=phone,
+        dob_from=dob_from,
+        dob_to=dob_to,
+    )
+    return templates.TemplateResponse(
+        "clients/list.html",
+        {
+            "request": request,
+            "clients": clients,
+            "q": q,
+            "first": first,
+            "last": last,
+            "email": email,
+            "phone": phone,
+            "dob_from": dob_from,
+            "dob_to": dob_to,
+        },
+    )
 
 @router.get("/clients/new", response_class=HTMLResponse)
 def new_client_page(request: Request):
