@@ -5,28 +5,38 @@
     <h1>Trips</h1>
     <a href="/trips/new" class="btn primary">New Trip</a>
   </div>
-  {% set show_bookings = trips|length > 0 and trips[0].bookings is not none %}
+
+  <div class="tabs">
+    <a href="/trips?tab=upcoming" class="{% if tab != 'past' %}active{% endif %}">Upcoming</a>
+    <a href="/trips?tab=past" class="{% if tab == 'past' %}active{% endif %}">Past</a>
+  </div>
+
+  {% if tab == 'past' %}
+    {% set trips = past %}
+  {% else %}
+    {% set trips = upcoming %}
+  {% endif %}
+
   <table class="table">
     <thead>
       <tr>
         <th>Name</th>
-        <th>Created</th>
-        <th>Updated</th>
-        {% if show_bookings %}<th>#Bookings</th>{% endif %}
+        <th>Start</th>
+        <th>End</th>
       </tr>
     </thead>
     <tbody>
       {% for t in trips %}
-      <tr>
-        <td><a href="/trips/{{ t.id }}">{{ t.name }}</a></td>
-        <td>{{ t.created_at }}</td>
-        <td>{{ t.updated_at }}</td>
-        {% if show_bookings %}<td>{{ t.bookings|length }}</td>{% endif %}
+      <tr class="{% if tab == 'past' %}row-muted{% endif %}">
+        <td><a href="/trips/{{ t.id }}">{{ t.name }}</a> <span class="badge">{{ t.bookings|length }}</span></td>
+        <td>{{ t.start_date or '' }}</td>
+        <td>{{ t.end_date or '' }}</td>
       </tr>
       {% else %}
-      <tr><td colspan="{{ 3 + (1 if show_bookings else 0) }}">No trips yet.</td></tr>
+      <tr><td colspan="3">No trips yet.</td></tr>
       {% endfor %}
     </tbody>
   </table>
 </div>
 {% endblock %}
+
