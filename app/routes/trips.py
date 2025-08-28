@@ -1,12 +1,13 @@
 # app/routes/trips.py
 from typing import Annotated
+from datetime import date
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 
-from .. import crud, db
+from .. import crud, db, models
 from ..schemas import TripCreate  # concrete schema
 
 router = APIRouter()
@@ -15,9 +16,24 @@ templates = Jinja2Templates(directory="app/templates")
 
 @router.get("/trips", response_class=HTMLResponse)
 def list_trips_page(request: Request, db_session: Session = Depends(db.get_db)):
-    trips = crud.trips.list_trips(db_session)
+    today = date.today()
+    trips = (
+        db_session.query(models.Trip)
+        .options(selectinload(models.Trip.bookings))
+        .order_by(models.Trip.created_at.desc())
+        .all()
+    )
+    upcoming = [t for t in trips if t.start_date is None or t.start_date >= today]
+    past = [t for t in trips if t.start_date is not None and t.start_date < today]
+    tab = request.query_params.get("tab", "upcoming")
     return templates.TemplateResponse(
-        "trips/list.html", {"request": request, "trips": trips}
+        "trips/list.html",
+        {
+            "request": request,
+            "upcoming": upcoming,
+            "past": past,
+            "tab": tab,
+        },
     )
 
 
